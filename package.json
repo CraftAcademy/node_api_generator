@@ -32,6 +32,7 @@
   },
   "main": "bin/node_api_generator",
   "preferGlobal": true,
+  "cli-name": "node-api",
   "bin": {
     "node-api": "./bin/node_api_generator"
   },
@@ -50,7 +51,7 @@
     "templates/"
   ],
   "scripts": {
-    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "test": "mocha --timeout 999999 --reporter spec --bail --check-leaks test/",
     "test-ci": "mocha --reporter spec --check-leaks test/"
   }
 }

@@ -1,7 +1,8 @@
 const path = require('path');
 const spawn = require('child_process').spawn;
 const mkdirp = require('mkdirp');
-
+const rimraf = require('rimraf');
+const exec = require('child_process').exec;
 const expect = require('chai').expect
 
 const binPath = path.resolve(__dirname, '../../bin/node_api_generator');
@@ -31,13 +32,10 @@ const run = (dir, args, callback) => {
   child.on('error', callback);
 
   function onclose(code) {
-    const err = null;
+    let err = null;
 
     try {
-      // expect(stderr).to.deep.equal('')
-      // assert.equal(stderr, '');
       expect(code).to.equal(0)
-      // assert.strictEqual(code, 0);
     } catch (e) {
       err = e;
     }
@@ -56,4 +54,49 @@ const createEnvironment = (callback) => {
   });
 }
 
-module.exports = { run, path, createEnvironment, tempDir }
+const cleanup = (dir, callback) => {
+  if (typeof dir === 'function') {
+    callback = dir;
+    dir = tempDir;
+  }
+
+  rimraf(tempDir, (err) => {
+    callback(err);
+  });
+}
+
+const npmInstall = (dir, callback) => {
+  exec('npm install', { cwd: dir }, function (err, stderr) {
+    if (err) {
+      err.message += stderr;
+      callback(err);
+      return;
+    }
+
+    callback();
+  });
+}
+
+const parseCreatedFiles = (output, dir) => {
+  var files = [];
+  var lines = output.split(/[\r\n]+/);
+  var match;
+
+  for (var i = 0; i < lines.length; i++) {
+    if ((match = /create.*?: (.*)$/.exec(lines[i]))) {
+      var file = match[1];
+
+      if (dir) {
+        file = path.resolve(dir, file);
+        file = path.relative(dir, file);
+      }
+
+      file = file.replace(/\\/g, '/');
+      files.push(file);
+    }
+  }
+
+  return files;
+}
+
+module.exports = { run, path, createEnvironment, tempDir, cleanup, parseCreatedFiles, npmInstall }

@@ -12,7 +12,7 @@ const _exit = process.exit;
 const eol = os.EOL;
 const pkg = require('../package.json');
 
-const version = pkg.version;
+const version = pkg['cli-name'];
 
 // Re-assign process.exit because of commander
 // TODO: Switch to a different command framework
@@ -214,10 +214,10 @@ function main() {
   const appName = path.basename(path.resolve(destinationPath));
 
   // Template engine
-  program.template = 'jade';
-  if (program.ejs) program.template = 'ejs';
-  if (program.hogan) program.template = 'hjs';
-  if (program.hbs) program.template = 'hbs';
+  // program.template = 'jade';
+  // if (program.ejs) program.template = 'ejs';
+  // if (program.hogan) program.template = 'hjs';
+  // if (program.hbs) program.template = 'hbs';
 
   // Generate application
   emptyDirectory(destinationPath, function (empty) {

@@ -1,36 +1,19 @@
-
-var assert = require('assert');
-var exec = require('child_process').exec;
-var fs = require('fs');
-// var mkdirp = require('mkdirp');
-var mocha = require('mocha');
-// var path = require('path');
-var request = require('supertest');
-var rimraf = require('rimraf');
-// var spawn = require('child_process').spawn;
+const fs = require('fs');
+const request = require('supertest');
 
 const expect = require('chai').expect
-const { run, path, createEnvironment, tempDir } = require('./helpers')
+const {
+  run,
+  path,
+  createEnvironment,
+  cleanup,
+  parseCreatedFiles,
+  npmInstall } = require('./helpers')
 
-// var binPath = path.resolve(__dirname, '../bin/node_api_generator');
-// var tempDir = path.resolve(__dirname, '../temp');
-
-describe('express(1)', function () {
-  mocha.before(function (done) {
-    this.timeout(30000);
-    cleanup(done);
-  });
-
-  mocha.after(function (done) {
-    this.timeout(30000);
-    cleanup(done);
-  });
-
-  describe('(no args)', function () {
-    let dir, files, output;
-
+describe('node-api', () => {
+  describe('(no args)', () => {
     before((done) => {
-      createEnvironment(function (err, newDir) {
+      createEnvironment((err, newDir) => {
         if (err) return done(err);
         dir = newDir;
         done();
@@ -38,9 +21,10 @@ describe('express(1)', function () {
     });
 
     after((done) => {
-      this.timeout(30000);
       cleanup(dir, done);
     });
+    let dir, files, output;
+
 
     it('is expected to create a basic app', (done) => {
       run(dir, [], (err, stdout) => {
@@ -79,7 +63,6 @@ describe('express(1)', function () {
     });
 
     it('is expected to have installable dependencies', (done) => {
-      this.timeout(30000);
       npmInstall(dir, done);
     });
 
@@ -90,131 +73,120 @@ describe('express(1)', function () {
       expect(typeof (app.handle)).to.equal('function')
     });
 
-    it('should respond to HTTP request', async (done) => {
-      var file = path.resolve(dir, 'app.js');
-      var app = require(file);
+    it('is expected to respond to HTTP request', (done) => {
+      const file = path.resolve(dir, 'app.js');
+      const app = require(file);
 
       request(app)
         .get('/')
         .expect(404, 'Cannot GET /\n', done);
     });
 
-    it('should generate a 404', function (done) {
-      var file = path.resolve(dir, 'app.js');
-      var app = require(file);
+    it('is expected to generate a 404', (done) => {
+      let file = path.resolve(dir, 'app.js');
+      let app = require(file);
 
       request(app)
         .get('/does_not_exist')
-        .expect(404,'Cannot GET /does_not_exist\n', done);
+        .expect(404, 'Cannot GET /does_not_exist\n', done);
     });
   });
 
-  describe('--git', function () {
-    let dir, files;
+  describe('--git', () => {
 
-    mocha.before( (done) =>  {
-      createEnvironment(function (err, newDir) {
+    before((done) => {
+      createEnvironment((err, newDir) => {
         if (err) return done(err);
         dir = newDir;
         done();
       });
     });
 
-    mocha.after( (done) => {
-      this.timeout(30000);
+    after((done) => {
       cleanup(dir, done);
     });
 
-    it('should create basic app with git files',  (done) => {
+    let dir, files;
+
+    it('is expected to create basic app with git files', (done) => {
       run(dir, ['--git'], (err, stdout) => {
         if (err) return done(err);
         files = parseCreatedFiles(stdout, dir);
-        assert.equal(files.length, 8, 'should have 8 files');
+        expect(files.length).to.equal(8)
         done();
       });
     });
 
-    it('should have basic files', function () {
-      assert.notEqual(files.indexOf('bin/www'), -1, 'should have bin/www file');
-      assert.notEqual(files.indexOf('app.js'), -1, 'should have app.js file');
-      assert.notEqual(files.indexOf('package.json'), -1, 'should have package.json file');
+    it('is expected to have basic files including .gitignore', () => {
+      expect(files.indexOf('bin/www')).to.not.equal(-1)
+      expect(files.indexOf('app.js')).to.not.equal(-1)
+      expect(files.indexOf('package.json')).to.not.equal(-1)
+      expect(files.indexOf('.gitignore')).to.not.equal(-1)
     });
 
-    it('should have .gitignore', function () {
-      assert.notEqual(files.indexOf('.gitignore'), -1, 'should have .gitignore file');
-    });
   });
 
-  describe('-h', function () {
-    var dir;
+  describe('-h', () => {
+    let dir, output, files;
 
-    mocha.before(function (done) {
-      createEnvironment(function (err, newDir) {
+    before((done) => {
+      createEnvironment((err, newDir) => {
         if (err) return done(err);
         dir = newDir;
-        done();
       });
+      run(dir, ['-h'], (err, stdout) => {
+        if (err) return done(err);
+        output = stdout
+        files = parseCreatedFiles(stdout, dir);
+        done();
+      })
     });
 
-    mocha.after(function (done) {
-      this.timeout(30000);
+    after((done) => {
       cleanup(dir, done);
     });
 
-    it('should print usage', function (done) {
-      run(dir, ['-h'], function (err, stdout) {
-        if (err) return done(err);
-        var files = parseCreatedFiles(stdout, dir);
-        assert.equal(files.length, 0);
-        assert.ok(/Usage: express/.test(stdout));
-        assert.ok(/--help/.test(stdout));
-        assert.ok(/--version/.test(stdout));
-        done();
-      });
+    it('is NOT expected to create any new files', () => {
+      expect(files.length).to.equal(0)
+
+    });
+
+    it('is expected to include text on general usage', () => {
+      expect(output).to.contain('Usage: node_api_generator [options] [dir]')
+    });
+
+    it('is expected to include Options text', () => {
+      expect(output).to.contain('Options:')
+    });
+
+    it('is expected to include --help text', () => {
+      expect(output)
+      .to.contain('-h, --help')
+      .and.contain('output usage information')
+    });
+
+    it('is expected to include --version text', () => {
+      expect(output)
+      .to.contain('-V, --version')
+
+    });
+
+    it('is expected to include --git text', () => {
+      expect(output)
+      .to.contain('--git')
+      .and.contain('add .gitignore')
+    });
+
+    it('is expected to include --force text', () => {
+      expect(output)
+      .to.contain('-f, --force')
+      .and.contain('force on non-empty directory')
     });
   });
 
-
-  describe('--help', function () {
-    var dir;
-
-    mocha.before(function (done) {
-      createEnvironment(function (err, newDir) {
-        if (err) return done(err);
-        dir = newDir;
-        done();
-      });
-    });
-
-    mocha.after(function (done) {
-      this.timeout(30000);
-      cleanup(dir, done);
-    });
-
-    it('should print usage', function (done) {
-      run(dir, ['--help'], function (err, stdout) {
-        if (err) return done(err);
-        var files = parseCreatedFiles(stdout, dir);
-        assert.equal(files.length, 0);
-        assert.ok(/Usage: express/.test(stdout));
-        assert.ok(/--help/.test(stdout));
-        assert.ok(/--version/.test(stdout));
-        done();
-      });
-    });
-  });
 });
 
-function cleanup(dir, callback) {
-  if (typeof dir === 'function') {
-    callback = dir;
-    dir = tempDir;
-  }
 
-  rimraf(tempDir, function (err) {
-    callback(err);
-  });
-}
 
 // function createEnvironment(callback) {
 //   var num = process.pid + Math.random();
@@ -226,39 +198,39 @@ function cleanup(dir, callback) {
 //   });
 // }
 
-function npmInstall(dir, callback) {
-  exec('npm install', { cwd: dir }, function (err, stderr) {
-    if (err) {
-      err.message += stderr;
-      callback(err);
-      return;
-    }
+// function npmInstall(dir, callback) {
+//   exec('npm install', { cwd: dir }, function (err, stderr) {
+//     if (err) {
+//       err.message += stderr;
+//       callback(err);
+//       return;
+//     }
 
-    callback();
-  });
-}
+//     callback();
+//   });
+// }
 
-function parseCreatedFiles(output, dir) {
-  var files = [];
-  var lines = output.split(/[\r\n]+/);
-  var match;
+// function parseCreatedFiles(output, dir) {
+//   var files = [];
+//   var lines = output.split(/[\r\n]+/);
+//   var match;
 
-  for (var i = 0; i < lines.length; i++) {
-    if ((match = /create.*?: (.*)$/.exec(lines[i]))) {
-      var file = match[1];
+//   for (var i = 0; i < lines.length; i++) {
+//     if ((match = /create.*?: (.*)$/.exec(lines[i]))) {
+//       var file = match[1];
 
-      if (dir) {
-        file = path.resolve(dir, file);
-        file = path.relative(dir, file);
-      }
+//       if (dir) {
+//         file = path.resolve(dir, file);
+//         file = path.relative(dir, file);
+//       }
 
-      file = file.replace(/\\/g, '/');
-      files.push(file);
-    }
-  }
+//       file = file.replace(/\\/g, '/');
+//       files.push(file);
+//     }
+//   }
 
-  return files;
-}
+//   return files;
+// }
 
 // function run(dir, args, callback) {
 //   var argv = [binPath].concat(args);
