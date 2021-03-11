@@ -31,7 +31,7 @@ describe('node-api', () => {
         if (err) return done(err); // not sure what it does for us?
         files = parseCreatedFiles(stdout, dir);
         output = stdout;
-        expect(files.length).to.equal(7)
+        expect(files.length).to.equal(26)
         done();
       });
     });

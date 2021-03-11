@@ -1,8 +1,8 @@
 const path = require('path');
 const spawn = require('child_process').spawn;
+const exec = require('child_process').exec;
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
-const exec = require('child_process').exec;
 const expect = require('chai').expect
 
 const binPath = path.resolve(__dirname, '../../bin/node_api_generator');
