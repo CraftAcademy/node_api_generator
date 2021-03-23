@@ -1,7 +1,7 @@
 {
   "name": "node-api-generator",
-  "description": "Express' application generator",
-  "version": "0.1.1",
+  "description": "Node API (with SequelizeORM) generator",
+  "version": "0.1.2",
   "author": "tochman <thomas@craftacademy.se>",
   "contributors": [
     "Thomas Ochman <thomas@craftacademy.se>",
@@ -28,7 +28,6 @@
   "dependencies": {
     "child-process-promise": "^2.2.1",
     "commander": "2.7.1",
-    "crypto-js": "^4.0.0",
     "mkdirp": "0.5.1",
     "sorted-object": "1.0.0"
   },
