@@ -100,7 +100,8 @@ function createApplication(app_name, path) {
   let routes = loadTemplate('js/routes/index.js');
   let factories = loadTemplate('js/specs/factories/index.js')
   let helpers = loadTemplate('js/specs/helpers/index.js')
-  let requestSpecTemplate = loadTemplate('js/specs/requests/getResource.spec.js')
+  let requestSpecTemplate = loadTemplate('js/specs/requests/getResource.feature.js')
+  let modelSpecTemplate = loadTemplate('js/specs/models/model.spec.js')
   let app = loadTemplate('js/app.js');
   let www = loadTemplate('js/www');
   let sequelizerc = loadTemplate('js/sequelizerc')
@@ -115,7 +116,7 @@ function createApplication(app_name, path) {
       , scripts: {
         "start": "node ./bin/www",
         "start:dev": "nodemon --inspect ./bin/www",
-        "test": "NODE_ENV=test NODE_NO_WARNINGS=1 mocha --recursive --exit $(find specs -name '*.spec.js')"
+        "test": "NODE_ENV=test NODE_NO_WARNINGS=1 mocha specs/**/*.{spec,feature}.js --recursive --exit "
       }, dependencies: {
         "cookie-parser": "^1.4.5",
         "express": "^4.17.1",
@@ -127,7 +128,9 @@ function createApplication(app_name, path) {
         "factory-girl": "^5.0.4",
         "mocha": "^8.1.2",
         "nodemon": "^2.0.4",
-        "supertest": "^4.0.2"
+        "supertest": "^4.0.2",
+        "sinon": "^9.2.4",
+        "sinon-chai": "^3.5.0",
       }
     }
 
@@ -186,9 +189,14 @@ function createApplication(app_name, path) {
       complete();
     });
 
-    // helpers
+    mkdir(path + '/specs/models', () => {
+      write(path + '/specs/models/model.spec.js', modelSpecTemplate);
+      complete();
+    });
+
+    // request/feature specs
     mkdir(path + '/specs/requests', () => {
-      write(path + '/specs/requests/getResource.spec.js', requestSpecTemplate);
+      write(path + '/specs/requests/getResource.feature.js', requestSpecTemplate);
       complete();
     });
 
@@ -199,7 +207,7 @@ function createApplication(app_name, path) {
     write(path + '/package.json', JSON.stringify(pkg, null, 2));
     write(path + '/app.js', app);
     write(path + '/.sequelizerc', sequelizerc);
-    mkdir(path + '/bin',  () => {
+    mkdir(path + '/bin', () => {
       www = www.replace('{name}', app_name);
       write(path + '/bin/www', www, 0755);
       complete();

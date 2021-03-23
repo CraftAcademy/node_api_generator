@@ -22,7 +22,9 @@ const appFiles = [
   'specs/helpers',
   'specs/helpers/index.js',
   'specs/requests',
-  'specs/requests/getResource.spec.js',
+  'specs/requests/getResource.feature.js',
+  'specs/models',
+  'specs/models/model.spec.js',
   'bin',
   'bin/www'
 ]

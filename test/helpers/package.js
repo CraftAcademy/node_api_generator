@@ -7,7 +7,7 @@ const packageContent = dir => ({
   "scripts": {
     "start": "node ./bin/www",
     "start:dev": "nodemon --inspect ./bin/www",
-    "test": "NODE_ENV=test NODE_NO_WARNINGS=1 mocha --recursive --exit $(find specs -name '*.spec.js')"
+    "test": "NODE_ENV=test NODE_NO_WARNINGS=1 mocha specs/**/*.{spec,feature}.js --recursive --exit "
   },
   "dependencies": {
     "cookie-parser": "^1.4.5",
@@ -21,6 +21,8 @@ const packageContent = dir => ({
     "factory-girl": "^5.0.4",
     "mocha": "^8.1.2",
     "nodemon": "^2.0.4",
+    "sinon": "^9.2.4",
+    "sinon-chai": "^3.5.0",
     "supertest": "^4.0.2"
   }
 })

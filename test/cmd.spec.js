@@ -28,7 +28,7 @@ describe('node-api', () => {
 
 
     it('is expected to create a basic app', (done) => {
-      const expectedFilesCount = 26
+      const expectedFilesCount = 28
 
       run(dir, [], (err, stdout) => {
         if (err) return done(err); // not sure what it does for us?
@@ -99,7 +99,7 @@ describe('node-api', () => {
     let dir, files;
 
     it('is expected to create basic app with git files', (done) => {
-      const expectedFilesCount = 27
+      const expectedFilesCount = 29
 
       run(dir, ['--git'], (err, stdout) => {
         if (err) return done(err);
