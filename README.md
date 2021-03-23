@@ -44,7 +44,7 @@ This generator can also be further configured with the following command line fl
 
 [SequelizeCLI](https://www.npmjs.com/package/sequelize-cli) is the Sequelize Command Line Interface (CLI) that brings thee power Sequelize generators to the your terminal.
 
-[Mocha][https://mochajs.org/] is a test framework running on Node. Used in both unit tests as well as in request specs (features).
+[Mocha](https://mochajs.org/) is a test framework running on Node. Used in both unit tests as well as in request specs (features).
 
 [Chai](https://www.chaijs.com/api/bdd/) is a BDD / TDD assertion library for Node.
 
@@ -105,7 +105,7 @@ No migrations were executed, database schema was already up to date.
 ```
 
 ### Run tests
-We've created one request spec, and one model spec for you as reference. Execute those by running:
+We've created one request spec, and one model spec for you as reference. Execute them by running:
 
 ```
 $ yarn test
@@ -113,9 +113,9 @@ $ yarn test
 
 ### Run tests in VSCode
 
-You can configure your VSCode to run your tests. That will allow youto set breakpoints and use the `debugger` command and halt the execution of your code.
+You can configure your VSCode to run your tests. That will allow you to set breakpoints and use the `debugger` command and halt the execution of your code.
 
-Go through the process of creating the `launch.json` file in VSCode am add the following configuration:
+Go through the process of creating the `launch.json` file in VSCode and add the following configuration:
 
 ```json
 "configurations": [
@@ -153,7 +153,7 @@ Go through the process of creating the `launch.json` file in VSCode am add the f
 
 ### Defining Factories
 
-Visit the [FactoryGirl](https://www.npmjs.com/package/factory-girl) documentation for more details. Here, we will show you how to create a basic factory that you can use to test your model andd to create fake instances for use in tests. Jets say you have a basic `User` model:
+Visit the [FactoryGirl](https://www.npmjs.com/package/factory-girl) documentation for more details. Here, we will show you how to create a basic factory that you can use to test your model and to create fake instances for use in tests. Lets say you have a basic `User` model:
 
 ```js
 'use strict';
@@ -195,7 +195,7 @@ module.exports = (factory, Models) => {
 }
 ```
 
-You can use your factory to create one anr many instances of the `User` model:
+You can use your factory to create one or many instances of the `User` model:
 
 ```js
 let author = await factory.create('User')
@@ -209,5 +209,3 @@ await factory.createMany('Book', 2, [
 ```
 
 There are many other use cases for factories. Make sure to check the documentation.
-
-
