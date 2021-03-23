@@ -1,7 +1,7 @@
 {
   "name": "node_api_generator",
   "description": "Express' application generator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "tochman <thomas@craftacademy.se>",
   "contributors": [
     "Thomas Ochman <thomas@craftacademy.se>",
