@@ -1,0 +1,32 @@
+const appFiles = [
+  '',
+  'package.json',
+  'app.js',
+  '.sequelizerc',
+  'routes',
+  'routes/index.js',
+  'database',
+  'controllers',
+  'controllers/resourceController.js',
+  'database/config',
+  'database/config/config.json',
+  'database/migrations',
+  'database/migrations/.keep',
+  'database/seeders',
+  'database/seeders/.keep',
+  'models',
+  'models/index.js',
+  'specs',
+  'specs/factories',
+  'specs/factories/index.js',
+  'specs/helpers',
+  'specs/helpers/index.js',
+  'specs/requests',
+  'specs/requests/getResource.feature.js',
+  'specs/models',
+  'specs/models/model.spec.js',
+  'bin',
+  'bin/www'
+]
+
+module.exports = appFiles

@@ -71,7 +71,7 @@ function confirm(msg, callback) {
  */
 
 function createApplication(app_name, path) {
-  let wait = 5;
+  let wait = 10;
 
   console.log();
   function complete() {
@@ -80,45 +80,125 @@ function createApplication(app_name, path) {
 
     console.log();
     console.log('   install dependencies:');
-    console.log('     %s cd %s && npm install', prompt, path);
+    console.log('     %s cd %s && yarn', prompt, path);
     console.log();
     console.log('   run the app:');
 
     if (launchedFromCmd()) {
-      console.log('     %s SET DEBUG=%s:* & npm start', prompt, app_name);
+      console.log('     %s SET DEBUG=%s:* & yarn start', prompt, app_name);
     } else {
-      console.log('     %s DEBUG=%s:* npm start', prompt, app_name);
+      console.log('     %s DEBUG=%s:* yarn start', prompt, app_name);
     }
 
     console.log();
   }
 
-  // JavaScript
+  // Templates
+  let controller = loadTemplate('js/controllers/resourceController.js')
+  let database = loadTemplate('js/database/config/config.json')
+  let models = loadTemplate('js/models/index.js')
+  let routes = loadTemplate('js/routes/index.js');
+  let factories = loadTemplate('js/specs/factories/index.js')
+  let helpers = loadTemplate('js/specs/helpers/index.js')
+  let requestSpecTemplate = loadTemplate('js/specs/requests/getResource.feature.js')
+  let modelSpecTemplate = loadTemplate('js/specs/models/model.spec.js')
   let app = loadTemplate('js/app.js');
   let www = loadTemplate('js/www');
-  let users = loadTemplate('js/routes/users.js');
+  let sequelizerc = loadTemplate('js/sequelizerc')
 
 
-  mkdir(path, function(){
-
-    mkdir(path + '/routes', function(){
-      write(path + '/routes/users.js', users);
-      complete();
-    });
-
+  mkdir(path, () => {
     // package.json
     const pkg = {
-        name: app_name
+      name: app_name
       , version: '0.0.0'
       , private: true
-      , scripts: { start: 'node ./bin/www' }
-      , dependencies: {
-          'express': '~4.13.1',
-          'body-parser': '~1.13.2',
-          'cookie-parser': '~1.3.5',
+      , scripts: {
+        "start": "node ./bin/www",
+        "start:dev": "nodemon --inspect ./bin/www",
+        "test": "NODE_ENV=test NODE_NO_WARNINGS=1 mocha specs/**/*.{spec,feature}.js --recursive --exit "
+      }, dependencies: {
+        "cookie-parser": "^1.4.5",
+        "express": "^4.17.1",
+        "pg": "^8.5.1",
+        "pg-hstore": "^2.3.3",
+        "sequelize": "^6.5.0"
+      }, devDependencies: {
+        "chai": "^4.2.0",
+        "factory-girl": "^5.0.4",
+        "mocha": "^8.1.2",
+        "nodemon": "^2.0.4",
+        "supertest": "^4.0.2",
+        "sinon": "^9.2.4",
+        "sinon-chai": "^3.5.0",
       }
     }
 
+    // routes
+    mkdir(path + '/routes', () => {
+      write(path + '/routes/index.js', routes);
+      complete();
+    });
+
+    // controllers
+    mkdir(path + '/controllers', () => {
+      write(path + '/controllers/resourceController.js', controller);
+      complete();
+    });
+
+    // database
+    mkdir(path + '/database/')
+    // config
+    mkdir(path + '/database/config', () => {
+      database = database.replace('{name}', app_name);
+      database = database.replace('{name}', app_name);
+      write(path + '/database/config/config.json', database);
+      complete();
+    });
+
+    // migrations
+    mkdir(path + '/database/migrations', () => {
+      write(path + '/database/migrations/.keep', '');
+      complete();
+    });
+
+    // seeders
+    mkdir(path + '/database/seeders', () => {
+      write(path + '/database/seeders/.keep', '');
+      complete();
+    });
+
+    // models
+    mkdir(path + '/models', () => {
+      write(path + '/models/index.js', models);
+      complete();
+    });
+
+    // specs
+    mkdir(path + '/specs/')
+
+    // factories
+    mkdir(path + '/specs/factories', () => {
+      write(path + '/specs/factories/index.js', factories);
+      complete();
+    });
+
+    // helpers
+    mkdir(path + '/specs/helpers', () => {
+      write(path + '/specs/helpers/index.js', helpers);
+      complete();
+    });
+
+    mkdir(path + '/specs/models', () => {
+      write(path + '/specs/models/model.spec.js', modelSpecTemplate);
+      complete();
+    });
+
+    // request/feature specs
+    mkdir(path + '/specs/requests', () => {
+      write(path + '/specs/requests/getResource.feature.js', requestSpecTemplate);
+      complete();
+    });
 
     // sort dependencies like npm(1)
     pkg.dependencies = sortedObject(pkg.dependencies);
@@ -126,14 +206,15 @@ function createApplication(app_name, path) {
     // write files
     write(path + '/package.json', JSON.stringify(pkg, null, 2));
     write(path + '/app.js', app);
-    mkdir(path + '/bin', function(){
+    write(path + '/.sequelizerc', sequelizerc);
+    mkdir(path + '/bin', () => {
       www = www.replace('{name}', app_name);
       write(path + '/bin/www', www, 0755);
       complete();
     });
 
     if (program.git) {
-      write(path + '/.gitignore', fs.readFileSync(__dirname + '/../templates/js/gitignore', 'utf-8'));
+      write(path + '/.gitignore', loadTemplate('js/gitignore'));
     }
 
     complete();
@@ -153,7 +234,7 @@ function copy_template(from, to) {
  */
 
 function emptyDirectory(path, fn) {
-  fs.readdir(path, function(err, files){
+  fs.readdir(path, function (err, files) {
     if (err && 'ENOENT' != err.code) throw err;
     fn(!files || !files.length);
   });
@@ -176,7 +257,7 @@ function exit(code) {
 
   exit.exited = true;
 
-  streams.forEach(function(stream){
+  streams.forEach(function (stream) {
     // submit empty write request and wait for completion
     draining += 1;
     stream.write('', done);
@@ -257,7 +338,7 @@ function write(path, str, mode) {
  */
 
 function mkdir(path, fn) {
-  mkdirp(path, 0755, function(err){
+  mkdirp(path, 0755, function (err) {
     if (err) throw err;
     console.log('   \033[36mcreate\033[0m : ' + path);
     fn && fn();
