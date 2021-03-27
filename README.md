@@ -3,7 +3,7 @@
 ## Installation
 
 ```sh
-$ npm install -g express-generator-api
+$ npm install -g node-api-generator
 ```
 
 ## Quick Start
@@ -49,6 +49,8 @@ This generator can also be further configured with the following command line fl
 [Chai](https://www.chaijs.com/api/bdd/) is a BDD / TDD assertion library for Node.
 
 [FactoryGirl](https://www.npmjs.com/package/factory-girl) provides factory methods to create test fixtures for automated software testing. Used in both unit tests as well as in request specs (features).
+
+[FakerJS](https://www.npmjs.com/package/faker) helps you real looking data to your tests or database seeders, and it also can be pretty entertaining.
 
 
 ## License

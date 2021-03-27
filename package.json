@@ -1,7 +1,7 @@
 {
   "name": "node-api-generator",
   "description": "Node API (with SequelizeORM) generator",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "tochman <thomas@craftacademy.se>",
   "contributors": [
     "Thomas Ochman <thomas@craftacademy.se>",

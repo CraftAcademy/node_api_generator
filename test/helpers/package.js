@@ -23,7 +23,8 @@ const packageContent = dir => ({
     "nodemon": "^2.0.4",
     "sinon": "^9.2.4",
     "sinon-chai": "^3.5.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "faker": "^5.5.0"
   }
 })
 
